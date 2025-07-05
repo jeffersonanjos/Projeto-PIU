@@ -1,6 +1,148 @@
+/*
+  Este arquivo CSS (Cascading Style Sheets) contém regras de estilo que definem a aparência
+  e o comportamento visual dos elementos HTML/React no seu aplicativo.
+  Ele é fundamental para o layout, as cores e as animações.
+*/
+
+/*
+  -----------------------------------------------------------------------------------
+  Estilos Globais e Reset Básico
+  -----------------------------------------------------------------------------------
+*/
+
+/*
+  Aplica estilos básicos ao HTML, ao corpo da página (body) e ao elemento
+  raiz do seu aplicativo React (geralmente uma <div> com id="root" no index.html).
+  Isso garante que o aplicativo ocupe toda a tela e remove margens/preenchimentos padrão
+  que os navegadores costumam adicionar.
+*/
 html, body, #root {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+  height: 100%; /* Define a altura para 100% da altura da viewport (tela visível). */
+  width: 100%;  /* Define a largura para 100% da largura da viewport. */
+  margin: 0;    /* Remove a margem externa padrão. */
+  padding: 0;   /* Remove o preenchimento interno padrão. */
+}
+
+/*
+  -----------------------------------------------------------------------------------
+  Estilos para o Modo Escuro (Dark Mode)
+  -----------------------------------------------------------------------------------
+*/
+
+/*
+  Esta classe é adicionada ao <body> do documento HTML quando o modo escuro está ativado
+  (controlado pelo estado 'darkMode' no App.jsx e pelo 'useEffect').
+  Você pode adicionar estilos globais aqui que afetam toda a página no modo escuro.
+*/
+body.dark-mode {
+  /*
+    Define a cor de fundo de toda a página para um cinza escuro.
+    Isso complementa os estilos de modo escuro dos componentes Conteiner e Card.
+  */
+  background-color: #333; /* Fundo escuro para o corpo da página */
+  /*
+    Define a cor do texto padrão para um cinza claro, garantindo legibilidade
+    em um fundo escuro.
+  */
+  color: #eee; /* Cor de texto clara para o modo escuro */
+  /*
+    Adiciona uma transição suave para a mudança de cor de fundo e texto,
+    tornando a alternância entre os modos mais agradável visualmente.
+  */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/*
+  Esta classe é adicionada ao <body> do documento HTML quando o modo claro está ativado.
+  Embora o fundo já seja definido no App.jsx, é uma boa prática ter uma classe explícita
+  para o modo claro também, caso você queira adicionar mais estilos específicos no futuro.
+*/
+body.light-mode {
+  background-color: #eaeaea; /* Fundo claro para o corpo da página */
+  color: #333; /* Cor de texto escura para o modo claro */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
+/*
+  -----------------------------------------------------------------------------------
+  Estilo para o Card Sendo Arrastado (.dragging)
+  -----------------------------------------------------------------------------------
+*/
+
+/*
+  A classe `.dragging` é aplicada a um elemento <Card> no momento em que o usuário
+  começa a arrastá-lo. Ela é adicionada e removida dinamicamente via JavaScript
+  (no componente App.jsx, na função handleDragStart e ao final do handleDrop).
+  O objetivo é fornecer um feedback visual claro de que o card está sendo movido.
+*/
+.dragging {
+  /*
+    'opacity' controla a transparência de um elemento.
+    Um valor de 0.5 significa que o card ficará 50% transparente,
+    permitindo que o usuário veja o que está por baixo e indicando que
+    o elemento está em um estado temporário (sendo arrastado).
+    Isso ajuda a diferenciar o card arrastado dos outros cards fixos.
+  */
+  opacity: 0.5;
+
+  /*
+    'border' define a borda de um elemento.
+    - '2px': A largura da borda será de 2 pixels.
+    - 'dashed': O estilo da borda será tracejado (pontilhado).
+    - '#999': A cor da borda será um cinza médio.
+    Esta borda tracejada e cinza reforça visualmente que o card está
+    em um estado de "seleção" ou "movimento", diferente de sua aparência normal.
+  */
+  border: 2px dashed #999;
+}
+
+/*
+  -----------------------------------------------------------------------------------
+  Estilo para o Card Alvo de um Drag-Over (.drag-over-target)
+  -----------------------------------------------------------------------------------
+*/
+
+/*
+  A classe `.drag-over-target` é aplicada a um elemento <Card> quando outro card
+  está sendo arrastado *sobre* ele. Isso indica ao usuário que este card específico
+  é um alvo potencial para soltar o card que está sendo arrastado, e que a reordenação
+  ocorrerá em relação a ele. Ela é adicionada/removida no Conteiner.jsx.
+*/
+.drag-over-target {
+  /*
+    'box-shadow' adiciona uma ou mais sombras a um elemento.
+    Aqui, estamos criando um "anel" azul ao redor do card para destacá-lo
+    como o alvo atual do arrasto.
+    - '0 0 0 2px':
+      - O primeiro '0' é o deslocamento horizontal da sombra (nenhum).
+      - O segundo '0' é o deslocamento vertical da sombra (nenhum).
+      - O terceiro '0' é o raio de desfoque da sombra (nenhum desfoque).
+      - O '2px' é o raio de espalhamento da sombra. Isso faz com que a sombra
+        se estenda 2 pixels para fora da borda do elemento, criando o efeito de "anel".
+    - '#007bff': A cor da sombra é um azul vibrante, comumente usado para
+      elementos interativos ou de foco (como o azul padrão do Bootstrap).
+  */
+  box-shadow: 0 0 0 2px #007bff; /* Um anel azul ao redor do card alvo */
+
+  /*
+    'transform' permite aplicar transformações 2D ou 3D a um elemento.
+    - 'scale(1.02)': Aumenta o tamanho do elemento em 2% (1.02 vezes o tamanho original).
+      Isso cria um efeito sutil de "pop-out" ou "elevação" quando o card é
+      passado por cima, indicando que ele está sendo "ativado" como um alvo.
+  */
+  transform: scale(1.02); /* Pequeno aumento de escala */
+
+  /*
+    'transition' especifica como as mudanças nas propriedades CSS devem ser animadas.
+    Isso torna a mudança de estilo suave, em vez de instantânea.
+    - 'transform': A propriedade que será animada (neste caso, a escala).
+    - '0.1s': A duração da animação será de 0.1 segundos (muito rápida).
+    - 'ease-in-out': A função de temporização da animação. Significa que a animação
+      começará e terminará lentamente, mas acelerará no meio, criando um movimento
+      mais natural.
+    Esta transição suave é crucial para uma boa experiência de usuário, pois evita
+    mudanças abruptas e torna a interação mais agradável.
+  */
+  transition: transform 0.1s ease-in-out;
 }
