@@ -126,26 +126,26 @@ const Conteiner = (props) => {
           Isso é útil porque 'children' pode ser um único elemento, um array de elementos,
           ou até mesmo nulo.
         */}
-        {React.Children.map(children, child => {
-          // Verifica se o 'child' atual é um elemento React válido e se é um componente 'Card'.
-          // Isso é importante para garantir que estamos manipulando apenas os Cards.
+        {React.Children.map(children, (child, index) => {
           if (React.isValidElement(child) && child.type === Card) {
-            // 'React.cloneElement' cria um novo elemento React baseado em 'child',
-            // mas permite adicionar ou sobrescrever props.
             return React.cloneElement(child, {
-              // Adiciona a função 'onDragOver' ao Card.
-              // Quando um card arrastado passa sobre este Card, 'handleDragOverCard' é chamada.
-              // Passamos o evento 'e' e o ID do card alvo (child.props.card.id).
               onDragOver: (e) => handleDragOverCard(e, child.props.card.id),
-              // Adiciona uma classe CSS condicionalmente para feedback visual.
-              // Se um card estiver sendo arrastado E não for o próprio card alvo,
-              // aplica a classe 'drag-over-target' (definida em App.css).
-              className: draggingCardId && draggingCardId !== child.props.card.id ? 'drag-over-target' : ''
+              onDrop: (e) => {
+                e.preventDefault();
+                const draggedCardId = e.dataTransfer.getData('cardId');
+                if (draggedCardId && draggedCardId !== child.props.card.id) {
+                  onCardReorder(draggedCardId, child.props.card.id, titulo);
+                }
+              },
+              className:
+                draggingCardId && draggingCardId !== child.props.card.id
+                  ? 'drag-over-target'
+                  : '',
             });
           }
-          // Se o filho não for um Card ou não for um elemento válido, retorna-o como está.
           return child;
         })}
+        
       </div>
     </div>
   );

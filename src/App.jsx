@@ -233,7 +233,7 @@ function App() {
           transition: 'background-color 0.3s ease, color 0.3s ease',
         }}
       >
-        {darkMode ? 'Modo Claro' : 'Modo Escuro'}
+        {darkMode ? '☀️' : '🌙'}
       </button>
 
       {/* Componente para criar novas tarefas */}

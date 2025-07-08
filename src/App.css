@@ -78,7 +78,8 @@ body.light-mode {
   */
 .drag-over-target {
   box-shadow: 0 0 0 2px #007bff; /* Um anel azul ao redor do card alvo */
-
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 1;
   /*
     'transform' permite aplicar transformações 2D ou 3D a um elemento.
     - 'scale(1.02)': Aumenta o tamanho do elemento em 2% (1.02 vezes o tamanho original).
@@ -109,6 +110,10 @@ body.light-mode {
   Quando um card recebe a classe 'card-enter', ele começa com opacidade 0
   e escala 0.9, e então transiciona para opacidade 1 e escala 1.
 */
+.card {
+  opacity: 1 !important;
+}
+
 .card-enter {
   animation: fadeInScale 0.3s ease-out forwards;
 }
