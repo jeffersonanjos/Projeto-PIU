@@ -32,97 +32,51 @@ html, body, #root {
 /*
   Esta classe é adicionada ao <body> do documento HTML quando o modo escuro está ativado
   (controlado pelo estado 'darkMode' no App.jsx e pelo 'useEffect').
-  Você pode adicionar estilos globais aqui que afetam toda a página no modo escuro.
+  Você pode adicionar estilos específicos para o modo escuro aqui.
 */
 body.dark-mode {
-  /*
-    Define a cor de fundo de toda a página para um cinza escuro.
-    Isso complementa os estilos de modo escuro dos componentes Conteiner e Card.
-  */
-  background-color: #333; /* Fundo escuro para o corpo da página */
-  /*
-    Define a cor do texto padrão para um cinza claro, garantindo legibilidade
-    em um fundo escuro.
-  */
-  color: #eee; /* Cor de texto clara para o modo escuro */
-  /*
-    Adiciona uma transição suave para a mudança de cor de fundo e texto,
-    tornando a alternância entre os modos mais agradável visualmente.
-  */
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: #282c34; /* Cor de fundo escura para o modo escuro. */
+  color: #f0f0f0;            /* Cor do texto clara para o modo escuro. */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave. */
 }
 
 /*
-  Esta classe é adicionada ao <body> do documento HTML quando o modo claro está ativado.
-  Embora o fundo já seja definido no App.jsx, é uma boa prática ter uma classe explícita
-  para o modo claro também, caso você queira adicionar mais estilos específicos no futuro.
+  Estilos para o modo claro (padrão, ou quando a classe 'light-mode' é aplicada).
 */
 body.light-mode {
-  background-color: #eaeaea; /* Fundo claro para o corpo da página */
-  color: #333; /* Cor de texto escura para o modo claro */
-  transition: background-color 0.3s ease, color 0.3s ease;
+  background-color: #f0f2f5; /* Cor de fundo clara para o modo claro. */
+  color: #333;               /* Cor do texto escura para o modo claro. */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave. */
 }
 
-
 /*
   -----------------------------------------------------------------------------------
-  Estilo para o Card Sendo Arrastado (.dragging)
+  Estilos para Drag and Drop (Arrastar e Soltar)
   -----------------------------------------------------------------------------------
 */
 
 /*
-  A classe `.dragging` é aplicada a um elemento <Card> no momento em que o usuário
-  começa a arrastá-lo. Ela é adicionada e removida dinamicamente via JavaScript
-  (no componente App.jsx, na função handleDragStart e ao final do handleDrop).
-  O objetivo é fornecer um feedback visual claro de que o card está sendo movido.
+  Estilo aplicado ao card que está sendo arrastado.
+  - 'opacity: 0.5': Torna o card semi-transparente para indicar que está em movimento.
+  - 'border: 2px dashed #999': Adiciona uma borda tracejada para feedback visual.
 */
 .dragging {
-  /*
-    'opacity' controla a transparência de um elemento.
-    Um valor de 0.5 significa que o card ficará 50% transparente,
-    permitindo que o usuário veja o que está por baixo e indicando que
-    o elemento está em um estado temporário (sendo arrastado).
-    Isso ajuda a diferenciar o card arrastado dos outros cards fixos.
-  */
   opacity: 0.5;
-
-  /*
-    'border' define a borda de um elemento.
-    - '2px': A largura da borda será de 2 pixels.
-    - 'dashed': O estilo da borda será tracejado (pontilhado).
-    - '#999': A cor da borda será um cinza médio.
-    Esta borda tracejada e cinza reforça visualmente que o card está
-    em um estado de "seleção" ou "movimento", diferente de sua aparência normal.
-  */
   border: 2px dashed #999;
 }
 
 /*
-  -----------------------------------------------------------------------------------
-  Estilo para o Card Alvo de um Drag-Over (.drag-over-target)
-  -----------------------------------------------------------------------------------
-*/
-
-/*
-  A classe `.drag-over-target` é aplicada a um elemento <Card> quando outro card
-  está sendo arrastado *sobre* ele. Isso indica ao usuário que este card específico
-  é um alvo potencial para soltar o card que está sendo arrastado, e que a reordenação
-  ocorrerá em relação a ele. Ela é adicionada/removida no Conteiner.jsx.
-*/
-.drag-over-target {
-  /*
-    'box-shadow' adiciona uma ou mais sombras a um elemento.
-    Aqui, estamos criando um "anel" azul ao redor do card para destacá-lo
-    como o alvo atual do arrasto.
-    - '0 0 0 2px':
-      - O primeiro '0' é o deslocamento horizontal da sombra (nenhum).
-      - O segundo '0' é o deslocamento vertical da sombra (nenhum).
-      - O terceiro '0' é o raio de desfoque da sombra (nenhum desfoque).
+  Estilo aplicado ao card que é o "alvo" de um arrasto (ou seja, um card está
+  sendo arrastado sobre ele).
+  - 'box-shadow': Cria um efeito de "anel" azul ao redor do card.
+    - '0 0 0 2px': Define a sombra.
+      - Os primeiros três '0's são offsets X, Y e desfoque (sem offset, sem desfoque).
       - O '2px' é o raio de espalhamento da sombra. Isso faz com que a sombra
         se estenda 2 pixels para fora da borda do elemento, criando o efeito de "anel".
     - '#007bff': A cor da sombra é um azul vibrante, comumente usado para
       elementos interativos ou de foco (como o azul padrão do Bootstrap).
   */
+.drag-over-target {
   box-shadow: 0 0 0 2px #007bff; /* Um anel azul ao redor do card alvo */
 
   /*
@@ -139,10 +93,78 @@ body.light-mode {
     - 'transform': A propriedade que será animada (neste caso, a escala).
     - '0.1s': A duração da animação será de 0.1 segundos (muito rápida).
     - 'ease-in-out': A função de temporização da animação. Significa que a animação
-      começará e terminará lentamente, mas acelerará no meio, criando um movimento
-      mais natural.
-    Esta transição suave é crucial para uma boa experiência de usuário, pois evita
-    mudanças abruptas e torna a interação mais agradável.
+      começa e termina lentamente, mas acelera no meio.
   */
-  transition: transform 0.1s ease-in-out;
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Transição suave */
+}
+
+/*
+  -----------------------------------------------------------------------------------
+  Animações para Adicionar e Excluir Cards
+  -----------------------------------------------------------------------------------
+*/
+
+/*
+  Animação de entrada para novos cards.
+  Quando um card recebe a classe 'card-enter', ele começa com opacidade 0
+  e escala 0.9, e então transiciona para opacidade 1 e escala 1.
+*/
+.card-enter {
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*
+  Animação de saída para cards que estão sendo excluídos.
+  Quando um card recebe a classe 'card-exit', ele transiciona para opacidade 0
+  e escala 0.9, e é movido para cima, antes de ser removido do DOM.
+*/
+.card-exit {
+  animation: fadeOutScaleUp 0.3s ease-in forwards;
+}
+
+@keyframes fadeOutScaleUp {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+}
+
+/*
+  -----------------------------------------------------------------------------------
+  Animação para o formulário de adição de tarefas
+  -----------------------------------------------------------------------------------
+*/
+
+/*
+  Animação de entrada para o formulário de tarefas (opcional, pode ser aplicada
+  se o formulário for condicionalmente renderizado).
+*/
+.task-form-enter {
+  animation: slideInFromTop 0.5s ease-out forwards;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

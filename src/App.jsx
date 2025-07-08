@@ -12,6 +12,9 @@ import Conteiner from './components/Conteiner';
 // Este componente será usado para criar os itens (tarefas) dentro das colunas.
 import Card from './components/Card';
 
+// Importa o novo componente 'TaskForm' para criar novas tarefas.
+import TaskForm from './components/TaskForm';
+
 // Importa o arquivo de estilos CSS para este componente.
 // Aqui definimos estilos globais e classes CSS para animações.
 import './App.css';
@@ -48,6 +51,10 @@ function App() {
   // seu valor é 'null'.
   // 'setDraggingCardId' é a função para atualizar este ID.
   const [draggingCardId, setDraggingCardId] = useState(null);
+
+  // 'deletingCardId' armazena o ID do card que está em processo de exclusão.
+  // Usado para aplicar a animação de saída antes de remover o card do DOM.
+  const [deletingCardId, setDeletingCardId] = useState(null);
 
   // -------------------------------------------------------------------
   // Efeitos Colaterais (Hook useEffect)
@@ -119,216 +126,212 @@ function App() {
           // Se o 'id' do card atual for igual ao 'cardId' que foi arrastado,
           // criamos um NOVO objeto de card (usando o operador spread '...')
           // e atualizamos sua propriedade 'column' para a 'targetColumn'.
-          // Se não for o card arrastado, retornamos o card original sem alterações.
-          // Isso garante que o React detecte a mudança e re-renderize apenas o necessário.
+          // Se não for o card arrastado, retornamos o card original sem modificações.
           card.id === cardId ? { ...card, column: targetColumn } : card
         )
       );
     }
-    // Reseta o 'draggingCardId' para 'null' porque o arrasto terminou.
+    // Remove a classe 'dragging' do elemento que estava sendo arrastado.
+    // Isso reseta os estilos visuais.
+    e.target.classList.remove('dragging');
+    // Reseta o estado 'draggingCardId' para null, indicando que nenhum card está mais sendo arrastado.
     setDraggingCardId(null);
-    // Remove a classe 'dragging' do elemento que foi arrastado,
-    // restaurando sua aparência normal.
-    e.currentTarget.classList.remove('dragging');
   };
 
-  // Função para reordenar cards dentro da mesma coluna ou ao mover entre colunas.
+  // Função para reordenar cards dentro da mesma coluna.
   // 'draggedCardId': ID do card que está sendo arrastado.
   // 'targetCardId': ID do card sobre o qual o card arrastado está passando.
-  // 'targetColumn': Título da coluna onde a reordenação está ocorrendo.
-  const handleCardReorder = (draggedCardId, targetCardId, targetColumn) => {
-    // Atualiza o estado 'cards' de forma imutável.
-    setCards(prevCards => {
-      // Cria uma cópia do array 'prevCards' para não modificar o estado diretamente.
-      const newCards = [...prevCards];
-      // Encontra o índice (posição) do card arrastado no array.
-      const draggedIndex = newCards.findIndex(card => card.id === draggedCardId);
-      // Encontra o índice (posição) do card alvo no array.
-      const targetIndex = newCards.findIndex(card => card.id === targetCardId);
+  // 'column': A coluna em que a reordenação está ocorrendo.
+  const handleCardReorder = (draggedCardId, targetCardId, column) => {
+    // Encontra o card que está sendo arrastado.
+    const draggedCard = cards.find(card => card.id === draggedCardId);
+    // Encontra o card que é o alvo da reordenação.
+    const targetCard = cards.find(card => card.id === targetCardId);
 
-      // Se um dos cards não for encontrado (por algum motivo inesperado),
-      // retorna o array original sem alterações.
-      if (draggedIndex === -1 || targetIndex === -1) return prevCards;
+    // Se ambos os cards existirem e estiverem na mesma coluna, procede com a reordenação.
+    if (draggedCard && targetCard && draggedCard.column === column && targetCard.column === column) {
+      // Cria uma nova lista de cards, excluindo o card arrastado.
+      const updatedCards = cards.filter(card => card.id !== draggedCardId);
+      // Encontra o índice do card alvo na lista atualizada.
+      const targetIndex = updatedCards.findIndex(card => card.id === targetCardId);
 
-      // Armazena os objetos dos cards arrastado e alvo.
-      const draggedCard = newCards[draggedIndex];
-      const targetCard = newCards[targetIndex];
+      // Insere o card arrastado na posição do card alvo.
+      updatedCards.splice(targetIndex, 0, draggedCard);
 
-      // Lógica para reordenação:
-      // Se o card arrastado e o card alvo estão na mesma coluna:
-      if (draggedCard.column === targetCard.column) {
-        // 'splice(start, deleteCount)' remove elementos de um array.
-        // Remove o card arrastado de sua posição original.
-        newCards.splice(draggedIndex, 1);
-        // 'splice(start, deleteCount, item1, item2, ...)' também pode inserir elementos.
-        // Insere o card arrastado na nova posição.
-        // A lógica 'targetIndex > draggedIndex ? targetIndex - 1 : targetIndex'
-        // ajusta o índice de inserção para garantir que o card seja colocado
-        // corretamente, mesmo que o índice do alvo mude após a remoção.
-        newCards.splice(targetIndex > draggedIndex ? targetIndex - 1 : targetIndex, 0, draggedCard);
-      } else {
-        // Se estão em colunas diferentes:
-        // Primeiro, atualiza a propriedade 'column' do card arrastado para a nova coluna.
-        draggedCard.column = targetColumn;
-        // Remove o card arrastado de sua coluna antiga.
-        newCards.splice(draggedIndex, 1);
-        // Filtra os cards da nova coluna e encontra o índice do card alvo dentro dela.
-        const newTargetIndex = newCards.filter(card => card.column === targetColumn).findIndex(card => card.id === targetCardId);
-        if (newTargetIndex !== -1) {
-          // Se o card alvo foi encontrado na nova coluna, insere o card arrastado
-          // antes dele.
-          newCards.splice(newTargetIndex, 0, draggedCard);
-        } else {
-          // Se não encontrou o card alvo na nova coluna (por exemplo, a coluna estava vazia
-          // e o card foi solto nela), adiciona o card arrastado ao final da nova coluna.
-          newCards.push(draggedCard);
-        }
-      }
-      // Retorna o array de cards atualizado.
-      return newCards;
-    });
+      // Atualiza o estado dos cards com a nova ordem.
+      setCards(updatedCards);
+    }
+  };
+
+  // Função para adicionar uma nova tarefa.
+  // 'newTask': Objeto contendo o título e a descrição da nova tarefa.
+  const handleAddTask = (newTask) => {
+    // Gera um ID único para a nova tarefa.
+    const newCard = {
+      id: `card-${Date.now()}`, // ID único baseado no timestamp.
+      titulo: newTask.title,
+      descricao: newTask.description,
+      column: 'Pendente', // Novas tarefas começam na coluna 'Pendente'.
+      // Adiciona uma classe para a animação de entrada (aparecimento).
+      className: 'card-enter',
+    };
+    // Atualiza o estado 'cards' adicionando a nova tarefa ao final.
+    setCards(prevCards => [...prevCards, newCard]);
+
+    // Remove a classe de animação de entrada após um curto período
+    // para que a animação possa ser reativada se o card for adicionado novamente.
+    setTimeout(() => {
+      setCards(prevCards =>
+        prevCards.map(card =>
+          card.id === newCard.id ? { ...card, className: '' } : card
+        )
+      );
+    }, 300); // Duração da animação de entrada em App.css
+  };
+
+  // Função para excluir uma tarefa.
+  // 'cardId': ID do card a ser excluído.
+  const handleDeleteTask = (cardId) => {
+    // Define o ID do card que está sendo excluído para ativar a animação de saída.
+    setDeletingCardId(cardId);
+
+    // Aguarda a duração da animação de saída antes de remover o card do estado.
+    setTimeout(() => {
+      setCards(prevCards => prevCards.filter(card => card.id !== cardId));
+      // Limpa o ID do card em exclusão.
+      setDeletingCardId(null);
+    }, 300); // Duração da animação de saída em App.css
   };
 
   // -------------------------------------------------------------------
   // Renderização do Componente (JSX)
   // -------------------------------------------------------------------
-
-  // O 'return' de um componente React define o que será renderizado na tela.
   return (
-    // O elemento <div> mais externo que contém toda a estrutura do aplicativo.
-    // Os estilos são aplicados diretamente usando um objeto JavaScript (estilos inline).
-    <div
-      style={{
-        display: "flex", // Usa Flexbox para organizar os contêineres horizontalmente.
-        height: "100vh", // Ocupa 100% da altura da viewport (tela visível).
-        width: "100vw",  // Ocupa 100% da largura da viewport.
-        margin: 0,       // Remove margens padrão.
-        padding: "16px", // Adiciona preenchimento interno de 16 pixels.
-        // Define a cor de fundo do aplicativo, mudando com base no 'darkMode'.
-        background: darkMode ? "#333" : "#eaeaea",
-        gap: "16px",     // Espaçamento de 16 pixels entre os itens flex (contêineres).
-        boxSizing: "border-box", // Garante que padding e border sejam incluídos na largura/altura total.
-        transition: "background 0.3s ease", // Transição suave para a mudança de fundo.
-      }}
-    >
-      {/* Botão para alternar o modo claro/escuro */}
+    // O div principal que envolve toda a aplicação.
+    // Adiciona estilos inline para flexbox, centralizando o conteúdo.
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column', // Organiza os itens em coluna (topo para baixo).
+      alignItems: 'center',    // Centraliza os itens horizontalmente.
+      padding: '20px',         // Adiciona preenchimento ao redor do conteúdo.
+      minHeight: '100vh',      // Garante que o container ocupe a altura total da viewport.
+      boxSizing: 'border-box', // Inclui padding e border no cálculo da largura/altura.
+    }}>
+      {/* Botão para alternar o modo escuro/claro */}
       <button
-        onClick={toggleDarkMode} // Quando clicado, chama a função 'toggleDarkMode'.
+        onClick={toggleDarkMode}
         style={{
-          position: "absolute", // Posiciona o botão de forma absoluta em relação ao seu pai mais próximo com posição não estática.
-          top: "10px",      // 10 pixels do topo.
-          right: "10px",    // 10 pixels da direita.
-          padding: "10px 20px", // Preenchimento interno do botão.
-          // Cor de fundo do botão, muda com o 'darkMode'.
-          backgroundColor: darkMode ? "#555" : "#ddd",
-          // Cor do texto do botão, muda com o 'darkMode'.
-          color: darkMode ? "#fff" : "#333",
-          border: "none",   // Remove a borda padrão do botão.
-          borderRadius: "5px", // Cantos arredondados.
-          cursor: "pointer", // O cursor vira uma "mãozinha" ao passar por cima.
-          zIndex: 1000,      // Garante que o botão fique acima de outros elementos.
+          padding: '10px 20px',
+          borderRadius: '5px',
+          border: 'none',
+          backgroundColor: darkMode ? '#61dafb' : '#282c34', // Cores baseadas no tema.
+          color: darkMode ? '#282c34' : '#61dafb',
+          cursor: 'pointer',
+          marginBottom: '20px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          transition: 'background-color 0.3s ease, color 0.3s ease',
         }}
       >
-        {/* Texto do botão, muda para "Claro" ou "Escuro" dependendo do modo atual. */}
-        Alternar Modo {darkMode ? "Claro" : "Escuro"}
+        {darkMode ? 'Modo Claro' : 'Modo Escuro'}
       </button>
 
-      {/*
-        Componente Conteiner para a coluna "Concluída".
-        - 'titulo': O título exibido no cabeçalho da coluna.
-        - 'backgroundColor': A cor de fundo da área de conteúdo da coluna,
-          mudando com base no 'darkMode'.
-        - 'darkMode': Passa o estado atual do modo escuro para o Conteiner.
-        - 'onDrop': Passa a função 'handleDrop' para que o Conteiner possa
-          lidar com cards soltos nele.
-        - 'draggingCardId': Passa o ID do card que está sendo arrastado,
-          útil para feedback visual.
-        - 'onCardReorder': Passa a função 'handleCardReorder' para que o Conteiner
-          possa solicitar a reordenação de cards.
-      */}
-      <Conteiner
-        titulo="Concluída"
-        backgroundColor={darkMode ? "#4CAF50" : "green"}
+      {/* Componente para criar novas tarefas */}
+      <TaskForm
         darkMode={darkMode}
-        onDrop={handleDrop}
-        draggingCardId={draggingCardId}
-        onCardReorder={handleCardReorder}
-      >
-        {/*
-          Filtra os cards que pertencem à coluna "Concluída" e os mapeia para
-          componentes <Card>.
-          - 'filter': Cria um novo array contendo apenas os cards cuja 'column'
-            corresponde ao título desta coluna.
-          - 'map': Para cada card filtrado, renderiza um componente <Card>.
-            - 'key={card.id}': Uma 'key' única é ESSENCIAL para listas em React.
-              Ajuda o React a identificar quais itens mudaram, foram adicionados
-              ou removidos, otimizando a renderização.
-            - 'card={card}': Passa o objeto completo do card como uma prop 'card'.
-            - 'darkMode={darkMode}': Passa o estado do modo escuro para o Card.
-            - 'onDragStart={handleDragStart}': Passa a função para iniciar o arrasto.
-            - 'isDragging={draggingCardId === card.id}': Informa ao Card se ele
-              mesmo está sendo arrastado no momento.
-        */}
-        {cards
-          .filter(card => card.column === 'Concluída')
-          .map(card => (
-            <Card
-              key={card.id}
-              card={card}
-              darkMode={darkMode}
-              onDragStart={handleDragStart}
-              isDragging={draggingCardId === card.id}
-            />
-          ))}
-      </Conteiner>
+        onAddTask={handleAddTask}
+      />
 
-      {/* Componente Conteiner para a coluna "Pendente" (funciona da mesma forma que "Concluída") */}
-      <Conteiner
-        titulo="Pendente"
-        backgroundColor={darkMode ? "#FFC107" : "orange"}
-        darkMode={darkMode}
-        onDrop={handleDrop}
-        draggingCardId={draggingCardId}
-        onCardReorder={handleCardReorder}
-      >
-        {cards
-          .filter(card => card.column === 'Pendente')
-          .map(card => (
-            <Card
-              key={card.id}
-              card={card}
-              darkMode={darkMode}
-              onDragStart={handleDragStart}
-              isDragging={draggingCardId === card.id}
-            />
-          ))}
-      </Conteiner>
+      {/* Container para as colunas do Kanban */}
+      <div style={{
+        display: 'flex',
+        gap: '20px', // Espaçamento entre as colunas.
+        flexWrap: 'wrap', // Permite que as colunas quebrem para a próxima linha em telas menores.
+        justifyContent: 'center', // Centraliza as colunas horizontalmente.
+        width: '100%', // Ocupa 100% da largura disponível.
+        maxWidth: '1200px', // Limita a largura máxima para melhor visualização em telas grandes.
+      }}>
+        {/* Componente Conteiner para a coluna "Concluída" */}
+        <Conteiner
+          titulo="Concluída"
+          backgroundColor={darkMode ? "#4CAF50" : "lightgreen"}
+          darkMode={darkMode}
+          onDrop={handleDrop}
+          draggingCardId={draggingCardId}
+          onCardReorder={handleCardReorder}
+        >
+          {/* Filtra e renderiza os cards que pertencem à coluna "Concluída" */}
+          {cards
+            .filter(card => card.column === 'Concluída')
+            .map(card => (
+              <Card
+                key={card.id}
+                card={card}
+                darkMode={darkMode}
+                onDragStart={handleDragStart}
+                isDragging={draggingCardId === card.id}
+                onDeleteTask={handleDeleteTask} // Passa a função de exclusão para o Card
+                // Adiciona a classe 'card-exit' se o card estiver sendo excluído
+                className={deletingCardId === card.id ? 'card-exit' : card.className}
+              />
+            ))}
+        </Conteiner>
 
-      {/* Componente Conteiner para a coluna "Não-concluída" (funciona da mesma forma que "Concluída") */}
-      <Conteiner
-        titulo="Não-concluída"
-        backgroundColor={darkMode ? "#F44336" : "red"}
-        darkMode={darkMode}
-        onDrop={handleDrop}
-        draggingCardId={draggingCardId}
-        onCardReorder={handleCardReorder}
-      >
-        {cards
-          .filter(card => card.column === 'Não-concluída')
-          .map(card => (
-            <Card
-              key={card.id}
-              card={card}
-              darkMode={darkMode}
-              onDragStart={handleDragStart}
-              isDragging={draggingCardId === card.id}
-            />
-          ))}
-      </Conteiner>
+        {/* Componente Conteiner para a coluna "Pendente" */}
+        <Conteiner
+          titulo="Pendente"
+          backgroundColor={darkMode ? "#FFC107" : "orange"}
+          darkMode={darkMode}
+          onDrop={handleDrop}
+          draggingCardId={draggingCardId}
+          onCardReorder={handleCardReorder}
+        >
+          {/* Filtra e renderiza os cards que pertencem à coluna "Pendente" */}
+          {cards
+            .filter(card => card.column === 'Pendente')
+            .map(card => (
+              <Card
+                key={card.id}
+                card={card}
+                darkMode={darkMode}
+                onDragStart={handleDragStart}
+                isDragging={draggingCardId === card.id}
+                onDeleteTask={handleDeleteTask} // Passa a função de exclusão para o Card
+                // Adiciona a classe 'card-exit' se o card estiver sendo excluído
+                className={deletingCardId === card.id ? 'card-exit' : card.className}
+              />
+            ))}
+        </Conteiner>
+
+        {/* Componente Conteiner para a coluna "Não-concluída" (funciona da mesma forma que "Concluída") */}
+        <Conteiner
+          titulo="Não-concluída"
+          backgroundColor={darkMode ? "#F44336" : "red"}
+          darkMode={darkMode}
+          onDrop={handleDrop}
+          draggingCardId={draggingCardId}
+          onCardReorder={handleCardReorder}
+        >
+          {/* Filtra e renderiza os cards que pertencem à coluna "Não-concluída" */}
+          {cards
+            .filter(card => card.column === 'Não-concluída')
+            .map(card => (
+              <Card
+                key={card.id}
+                card={card}
+                darkMode={darkMode}
+                onDragStart={handleDragStart}
+                isDragging={draggingCardId === card.id}
+                onDeleteTask={handleDeleteTask} // Passa a função de exclusão para o Card
+                // Adiciona a classe 'card-exit' se o card estiver sendo excluído
+                className={deletingCardId === card.id ? 'card-exit' : card.className}
+              />
+            ))}
+        </Conteiner>
+      </div>
     </div>
   );
 }
 
-// Exporta o componente 'App' para que ele possa ser usado em outros arquivos,
-// como o 'main.jsx' (ou 'index.jsx') que renderiza o aplicativo na página HTML.
+// Exporta o componente 'App' para que ele possa ser usado em outros arquivos (como index.jsx).
 export default App;
