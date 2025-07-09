@@ -1,24 +1,19 @@
-// Importa a biblioteca React e o hook 'useState' para gerenciar o estado do formulário.
 import React, { useState } from 'react';
 
 // Define o componente funcional 'TaskForm'.
 // Ele recebe as propriedades 'darkMode' (para estilos) e 'onAddTask' (função para adicionar a tarefa).
+
 const TaskForm = ({ darkMode, onAddTask }) => {
-  // -------------------------------------------------------------------
-  // Gerenciamento de Estado (Hooks useState)
-  // -------------------------------------------------------------------
 
   // 'title' armazena o valor do campo de título da tarefa.
   // 'setTitle' é a função para atualizar o título.
   const [title, setTitle] = useState('');
+
   // 'description' armazena o valor do campo de descrição da tarefa.
   // 'setDescription' é a função para atualizar a descrição.
   const [description, setDescription] = useState('');
 
-  // -------------------------------------------------------------------
-  // Funções de Manipulação de Eventos
-  // -------------------------------------------------------------------
-
+ 
   // Função chamada quando o formulário é submetido.
   const handleSubmit = (e) => {
     // Previne o comportamento padrão do formulário, que recarregaria a página.
@@ -34,9 +29,6 @@ const TaskForm = ({ darkMode, onAddTask }) => {
     }
   };
 
-  // -------------------------------------------------------------------
-  // Renderização do Componente (JSX)
-  // -------------------------------------------------------------------
   return (
     // O elemento <form> que contém os campos de entrada e o botão de submissão.
     // O estilo é ajustado para ser minimalista e responsivo, e para se adaptar ao modo escuro.
@@ -44,18 +36,17 @@ const TaskForm = ({ darkMode, onAddTask }) => {
       onSubmit={handleSubmit}
       style={{
         display: 'flex',
-        flexDirection: 'column', // Organiza os itens em coluna.
-        gap: '10px',             // Espaçamento entre os elementos do formulário.
+        flexDirection: 'column',
+        gap: '10px',             
         padding: '20px',
-        marginBottom: '20px',    // Margem inferior para separar do resto do conteúdo.
-        borderRadius: '10px',    // Cantos arredondados.
-        // Cor de fundo e sombra ajustadas para o modo claro/escuro.
+        marginBottom: '20px',   
+        borderRadius: '10px',    
         backgroundColor: darkMode ? '#444' : '#fff',
         boxShadow: darkMode ? '0 4px 15px rgba(0, 0, 0, 0.4)' : '0 2px 10px rgba(0, 0, 0, 0.1)',
-        width: '100%',           // Ocupa a largura total do seu container pai.
-        maxWidth: '500px',       // Limita a largura máxima para melhor aparência.
-        boxSizing: 'border-box', // Inclui padding no cálculo da largura.
-        transition: 'background-color 0.3s ease, box-shadow 0.3s ease', // Transições suaves.
+        width: '100%',          
+        maxWidth: '500px',       
+        boxSizing: 'border-box', 
+        transition: 'background-color 0.3s ease, box-shadow 0.3s ease',
       }}
     >
       {/* Campo de entrada para o título da tarefa */}

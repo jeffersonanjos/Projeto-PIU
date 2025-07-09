@@ -1,175 +1,79 @@
 /*
-  Este arquivo CSS (Cascading Style Sheets) contém regras de estilo que definem a aparência
-  e o comportamento visual dos elementos HTML/React no seu aplicativo.
-  Ele é fundamental para o layout, as cores e as animações.
+  Arquivo CSS define estilos visuais e animações do app.
 */
 
-/*
-  -----------------------------------------------------------------------------------
-  Estilos Globais e Reset Básico
-  -----------------------------------------------------------------------------------
-*/
-
-/*
-  Aplica estilos básicos ao HTML, ao corpo da página (body) e ao elemento
-  raiz do seu aplicativo React (geralmente uma <div> com id="root" no index.html).
-  Isso garante que o aplicativo ocupe toda a tela e remove margens/preenchimentos padrão
-  que os navegadores costumam adicionar.
-*/
+/* --------------------
+   Reset básico e layout
+---------------------*/
 html, body, #root {
-  height: 100%; /* Define a altura para 100% da altura da viewport (tela visível). */
-  width: 100%;  /* Define a largura para 100% da largura da viewport. */
-  margin: 0;    /* Remove a margem externa padrão. */
-  padding: 0;   /* Remove o preenchimento interno padrão. */
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-/*
-  -----------------------------------------------------------------------------------
-  Estilos para o Modo Escuro (Dark Mode)
-  -----------------------------------------------------------------------------------
-*/
-
-/*
-  Esta classe é adicionada ao <body> do documento HTML quando o modo escuro está ativado
-  (controlado pelo estado 'darkMode' no App.jsx e pelo 'useEffect').
-  Você pode adicionar estilos específicos para o modo escuro aqui.
-*/
+/* --------------------
+   Modo Escuro e Claro
+---------------------*/
 body.dark-mode {
-  background-color: #282c34; /* Cor de fundo escura para o modo escuro. */
-  color: #f0f0f0;            /* Cor do texto clara para o modo escuro. */
-  transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave. */
+  background-color: #282c34;
+  color: #f0f0f0;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/*
-  Estilos para o modo claro (padrão, ou quando a classe 'light-mode' é aplicada).
-*/
 body.light-mode {
-  background-color: #f0f2f5; /* Cor de fundo clara para o modo claro. */
-  color: #333;               /* Cor do texto escura para o modo claro. */
-  transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave. */
+  background-color: #f0f2f5;
+  color: #333;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/*
-  -----------------------------------------------------------------------------------
-  Estilos para Drag and Drop (Arrastar e Soltar)
-  -----------------------------------------------------------------------------------
-*/
-
-/*
-  Estilo aplicado ao card que está sendo arrastado.
-  - 'opacity: 0.5': Torna o card semi-transparente para indicar que está em movimento.
-  - 'border: 2px dashed #999': Adiciona uma borda tracejada para feedback visual.
-*/
+/* --------------------
+   Drag and Drop
+---------------------*/
+/* Card sendo arrastado: semitransparente e borda tracejada */
 .dragging {
   opacity: 0.5;
   border: 2px dashed #999;
 }
 
-/*
-  Estilo aplicado ao card que é o "alvo" de um arrasto (ou seja, um card está
-  sendo arrastado sobre ele).
-  - 'box-shadow': Cria um efeito de "anel" azul ao redor do card.
-    - '0 0 0 2px': Define a sombra.
-      - Os primeiros três '0's são offsets X, Y e desfoque (sem offset, sem desfoque).
-      - O '2px' é o raio de espalhamento da sombra. Isso faz com que a sombra
-        se estenda 2 pixels para fora da borda do elemento, criando o efeito de "anel".
-    - '#007bff': A cor da sombra é um azul vibrante, comumente usado para
-      elementos interativos ou de foco (como o azul padrão do Bootstrap).
-  */
+/* Card alvo do drag: anel azul e leve zoom para feedback */
 .drag-over-target {
-  box-shadow: 0 0 0 2px #007bff; /* Um anel azul ao redor do card alvo */
-  background-color: rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 2px #007bff;
+  background-color: rgba(0,0,0,0.1);
   opacity: 1;
-  /*
-    'transform' permite aplicar transformações 2D ou 3D a um elemento.
-    - 'scale(1.02)': Aumenta o tamanho do elemento em 2% (1.02 vezes o tamanho original).
-      Isso cria um efeito sutil de "pop-out" ou "elevação" quando o card é
-      passado por cima, indicando que ele está sendo "ativado" como um alvo.
-  */
-  transform: scale(1.02); /* Pequeno aumento de escala */
-
-  /*
-    'transition' especifica como as mudanças nas propriedades CSS devem ser animadas.
-    Isso torna a mudança de estilo suave, em vez de instantânea.
-    - 'transform': A propriedade que será animada (neste caso, a escala).
-    - '0.1s': A duração da animação será de 0.1 segundos (muito rápida).
-    - 'ease-in-out': A função de temporização da animação. Significa que a animação
-      começa e termina lentamente, mas acelera no meio.
-  */
-  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out; /* Transição suave */
+  transform: scale(1.02); /* aumenta 2% para destacar */
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 }
 
-/*
-  -----------------------------------------------------------------------------------
-  Animações para Adicionar e Excluir Cards
-  -----------------------------------------------------------------------------------
-*/
-
-/*
-  Animação de entrada para novos cards.
-  Quando um card recebe a classe 'card-enter', ele começa com opacidade 0
-  e escala 0.9, e então transiciona para opacidade 1 e escala 1.
-*/
-.card {
-  opacity: 1 !important;
-}
-
+/* --------------------
+   Animações de Cards
+---------------------*/
+/* Aparece suavemente com aumento de escala */
 .card-enter {
   animation: fadeInScale 0.3s ease-out forwards;
 }
-
 @keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-/*
-  Animação de saída para cards que estão sendo excluídos.
-  Quando um card recebe a classe 'card-exit', ele transiciona para opacidade 0
-  e escala 0.9, e é movido para cima, antes de ser removido do DOM.
-*/
+/* Sai suavemente com redução de escala e sobe */
 .card-exit {
   animation: fadeOutScaleUp 0.3s ease-in forwards;
 }
-
 @keyframes fadeOutScaleUp {
-  from {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.9) translateY(-10px);
-  }
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to { opacity: 0; transform: scale(0.9) translateY(-10px); }
 }
 
-/*
-  -----------------------------------------------------------------------------------
-  Animação para o formulário de adição de tarefas
-  -----------------------------------------------------------------------------------
-*/
-
-/*
-  Animação de entrada para o formulário de tarefas (opcional, pode ser aplicada
-  se o formulário for condicionalmente renderizado).
-*/
+/* --------------------
+   Animação do formulário
+---------------------*/
+/* Formulário desliza de cima com fade */
 .task-form-enter {
   animation: slideInFromTop 0.5s ease-out forwards;
 }
-
 @keyframes slideInFromTop {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }

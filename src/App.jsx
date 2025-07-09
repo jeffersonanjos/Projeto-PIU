@@ -46,8 +46,7 @@ function App() {
     { id: 'card-5', titulo: 'Tarefa 5', descricao: 'Tarefa a fazer.', column: 'Não-concluída' },
   ]);
 
-  // 'draggingCardId' é uma variável de estado que armazena o 'id' do card
-  // que está sendo arrastado no momento. Se nenhum card estiver sendo arrastado,
+  // 'draggingCardId' é uma variável de estado que armazena o 'id' do card que está sendo arrastado no momento. Se nenhum card estiver sendo arrastado,
   // seu valor é 'null'.
   // 'setDraggingCardId' é a função para atualizar este ID.
   const [draggingCardId, setDraggingCardId] = useState(null);
@@ -57,19 +56,11 @@ function App() {
   const [deletingCardId, setDeletingCardId] = useState(null);
 
   // -------------------------------------------------------------------
-  // Efeitos Colaterais (Hook useEffect)
-  // -------------------------------------------------------------------
+// useEffect executa após renderizações e roda só quando 'darkMode' muda.
+// -------------------------------------------------------------------
 
-  // 'useEffect' é executado após cada renderização do componente.
-  // O segundo argumento, '[darkMode]', é um "array de dependências".
-  // Isso significa que o código dentro do 'useEffect' só será executado
-  // novamente se o valor de 'darkMode' mudar.
   useEffect(() => {
-    // Acessa o elemento <body> do documento HTML.
-    // Altera a classe CSS do <body> para 'dark-mode' se 'darkMode' for true,
-    // ou para 'light-mode' se 'darkMode' for false.
-    // Isso permite aplicar estilos globais (por exemplo, cor de fundo de toda a página)
-    // com base no tema atual usando CSS.
+// Atualiza a classe do <body> para aplicar estilos do modo escuro ou claro via CSS global.
     document.body.className = darkMode ? 'dark-mode' : 'light-mode';
   }, [darkMode]); // O efeito é re-executado apenas quando 'darkMode' muda.
 
@@ -200,22 +191,18 @@ function App() {
       setCards(prevCards => prevCards.filter(card => card.id !== cardId));
       // Limpa o ID do card em exclusão.
       setDeletingCardId(null);
-    }, 300); // Duração da animação de saída em App.css
+    }, 300);
   };
 
-  // -------------------------------------------------------------------
   // Renderização do Componente (JSX)
-  // -------------------------------------------------------------------
   return (
-    // O div principal que envolve toda a aplicação.
-    // Adiciona estilos inline para flexbox, centralizando o conteúdo.
     <div style={{
       display: 'flex',
-      flexDirection: 'column', // Organiza os itens em coluna (topo para baixo).
-      alignItems: 'center',    // Centraliza os itens horizontalmente.
-      padding: '20px',         // Adiciona preenchimento ao redor do conteúdo.
-      minHeight: '100vh',      // Garante que o container ocupe a altura total da viewport.
-      boxSizing: 'border-box', // Inclui padding e border no cálculo da largura/altura.
+      flexDirection: 'column',
+      alignItems: 'center',    
+      padding: '20px',        
+      minHeight: '100vh',      
+      boxSizing: 'border-box', 
     }}>
       {/* Botão para alternar o modo escuro/claro */}
       <button
@@ -242,14 +229,13 @@ function App() {
         onAddTask={handleAddTask}
       />
 
-      {/* Container para as colunas do Kanban */}
       <div style={{
         display: 'flex',
-        gap: '20px', // Espaçamento entre as colunas.
-        flexWrap: 'wrap', // Permite que as colunas quebrem para a próxima linha em telas menores.
-        justifyContent: 'center', // Centraliza as colunas horizontalmente.
-        width: '100%', // Ocupa 100% da largura disponível.
-        maxWidth: '1200px', // Limita a largura máxima para melhor visualização em telas grandes.
+        gap: '20px', 
+        flexWrap: 'wrap', 
+        justifyContent: 'center',
+        width: '100%', 
+        maxWidth: '1200px', 
       }}>
         {/* Componente Conteiner para a coluna "Concluída" */}
         <Conteiner
@@ -270,7 +256,7 @@ function App() {
                 darkMode={darkMode}
                 onDragStart={handleDragStart}
                 isDragging={draggingCardId === card.id}
-                onDeleteTask={handleDeleteTask} // Passa a função de exclusão para o Card
+                onDeleteTask={handleDeleteTask} 
                 // Adiciona a classe 'card-exit' se o card estiver sendo excluído
                 className={deletingCardId === card.id ? 'card-exit' : card.className}
               />
